@@ -2,13 +2,37 @@
 
 Shared runtime for klapom Python MCP services. Extracts the per-service
 boilerplate for logging, Prometheus metrics, dual-surface HTTP (REST +
-MCP Streamable-HTTP), and stdio MCP transport.
+MCP Streamable-HTTP), stdio MCP transport, and follow-up-hint emission
+(v0.2.0+).
 
 ## Install
 
 ```bash
-uv add "mcp-toolkit-py @ git+https://github.com/klapom/mcp-toolkit-py@v0.1.0"
+uv add "mcp-toolkit-py @ git+https://github.com/klapom/mcp-toolkit-py@v0.2.0"
 ```
+
+## Follow-up Hints (v0.2.0)
+
+Opt-in feature: after each FastMCP tool call, append a "Mögliche nächste
+Schritte" block + structured `_meta["x-pommer/next_actions"]` to the
+first text response. See `src/mcp_toolkit_py/hints/__init__.py` for the
+public API; rule files are MCP-specific and live next to each consuming
+package's code.
+
+```python
+from mcp_toolkit_py.hints import install_followup_hints
+
+# After all @mcp.tool decorators have run:
+install_followup_hints(
+    mcp,
+    rules_path=Path(__file__).parent / "hints" / "rules.yaml",
+    known_tools={t for t in mcp._tool_manager._tools
+                 if not t.startswith("internal_")},
+)
+```
+
+Env-flag: `MCP_FOLLOWUP_HINTS_ENABLED=true` enables, `forced_off` is the
+kill-switch, anything else (default) keeps responses untouched.
 
 ## Usage
 

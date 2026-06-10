@@ -1,7 +1,7 @@
 [project]
 name = "mcp-toolkit-py"
-version = "0.1.0"
-description = "Shared runtime for klapom Python MCP services: logging, metrics, dual-surface HTTP, stdio."
+version = "0.2.0"
+description = "Shared runtime for klapom Python MCP services: logging, metrics, dual-surface HTTP, stdio, follow-up hints."
 readme = "README.md"
 requires-python = ">=3.12,<3.14"
 license = { text = "MIT" }
@@ -15,6 +15,8 @@ dependencies = [
     "pydantic-settings>=2.5.0",
     "structlog>=24.4.0",
     "prometheus-client>=0.21.0",
+    # Sprint 16 — follow-up hints engine reads rules from YAML.
+    "pyyaml>=6.0",
 ]
 
 [build-system]
@@ -56,6 +58,11 @@ pretty = true
 [[tool.mypy.overrides]]
 module = ["tests.*"]
 disallow_untyped_defs = false
+
+# Sprint 16 — yaml has no upstream stubs in this project.
+[[tool.mypy.overrides]]
+module = ["yaml"]
+ignore_missing_imports = true
 
 # ─── pytest ──────────────────────────────────────────────────────────────
 [tool.pytest.ini_options]
