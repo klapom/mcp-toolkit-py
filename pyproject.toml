@@ -1,6 +1,6 @@
 [project]
 name = "mcp-toolkit-py"
-version = "0.2.0"
+version = "0.2.1"
 description = "Shared runtime for klapom Python MCP services: logging, metrics, dual-surface HTTP, stdio, follow-up hints."
 readme = "README.md"
 requires-python = ">=3.12,<3.14"

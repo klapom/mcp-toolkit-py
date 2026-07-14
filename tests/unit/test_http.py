@@ -190,3 +190,8 @@ async def test_run_dual_surface_invokes_gather(
     assert len(served) == 2
     ports = {s.port for s in served}
     assert ports == {12345, 12346}
+    # Regression guard: uvicorn's proxy_headers default trusts X-Forwarded-For
+    # from any 127.0.0.1 peer (exactly how cloudflared connects), letting a
+    # remote caller spoof request.client.host past every CIDR-based trust gate
+    # built on top of this transport. Must stay explicitly disabled.
+    assert all(s.proxy_headers is False for s in served)
