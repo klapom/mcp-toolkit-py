@@ -143,12 +143,21 @@ async def run_dual_surface(
     )
     mcp_app = mcp.streamable_http_app()
 
+    # proxy_headers=False: uvicorn's default (True, forwarded_allow_ips="127.0.0.1")
+    # trusts X-Forwarded-For from any peer connecting via 127.0.0.1 — which is
+    # exactly how cloudflared reaches us. That let a remote caller's own
+    # X-Forwarded-For overwrite request.client.host, defeating every CIDR-based
+    # trust gate built on top of this transport (require_own_tenant,
+    # require_pommer_internal). We terminate no external TLS here and read no
+    # X-Forwarded-For ourselves, so disabling this middleware only removes a
+    # spoofable input — it doesn't remove functionality.
     rest_config = uvicorn.Config(
         rest_app,
         host="0.0.0.0",
         port=listen_port,
         log_config=None,
         access_log=False,
+        proxy_headers=False,
     )
     mcp_config = uvicorn.Config(
         mcp_app,
@@ -156,6 +165,7 @@ async def run_dual_surface(
         port=mcp_port,
         log_config=None,
         access_log=False,
+        proxy_headers=False,
     )
 
     rest_server = uvicorn.Server(rest_config)
